@@ -26,10 +26,20 @@ client.on("message", function (message) {
 		// guild.members.filter(member => member.roles.array().length > 0).forEach(member => member.addRole(role));
 	}
 
+	if (command === "test") {
+		var role = message.guild.roles.cache.find(role => role.name === "Member");
+		message.member.roles.add(role);
+		message.reply("Member Role Added!");
+	}
+
 });
 
 client.on('guildMemberAdd', (guildMember) => {
-	guildMember.addRole(guildMember.guild.roles.find(role => role.name === "Member"));
+	var role = guildMember.guild.roles.cache.find(role => role.name === "Member");
+	guildMember.roles.add(role);
+	// let role = member.guild.roles.get("Member");
+	// if(!role) return console.log("Role doesen't exist.");
+	// guildMember.addRole(role);
 });
 
 client.login(config.BOT_TOKEN);
