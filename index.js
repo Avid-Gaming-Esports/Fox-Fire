@@ -35,11 +35,10 @@ client.on("message", function (message) {
 });
 
 client.on('guildMemberAdd', (guildMember) => {
+	console.log("Member added. Attempting to search role");
 	var role = guildMember.guild.roles.cache.find(role => role.name === "Member");
 	guildMember.roles.add(role);
-	// let role = member.guild.roles.get("Member");
-	// if(!role) return console.log("Role doesen't exist.");
-	// guildMember.addRole(role);
+	console.log("Added role");
 });
 
 client.login(config.BOT_TOKEN);
