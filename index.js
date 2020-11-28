@@ -5,6 +5,27 @@ const client = new Discord.Client();
 
 const prefix = "!";
 
+const QUOTE_LIST = [
+	"Don't you trust me?",
+	"Play time's over.",
+	"Shall we?",
+	"Indulge me.",
+	"How tempting.",
+	"Don't hold back.",
+	"Tell me a secret.",
+  "Don't you trust me?",
+  "I know what they desire.",
+  "Play time's over.",
+  "They're mine now.",
+  "It's too late for mercy.",
+  "Let's have some real fun.",
+  "No one will stand in my way.",
+	"They've exhausted their use.",
+	"If you'd like to play with me, you'd better be sure you know the game.",
+	"Come try your luck, if you think you're in my league.",
+	"Should I make your pulse rise? Or... STOP!",
+]
+
 client.on("message", function (message) {
 	if (message.author.bot) return;
 	if (!message.content.startsWith(prefix)) return;
@@ -26,10 +47,9 @@ client.on("message", function (message) {
 		// guild.members.filter(member => member.roles.array().length > 0).forEach(member => member.addRole(role));
 	}
 
-	if (command === "test") {
-		var role = message.guild.roles.cache.find(role => role.name === "Member");
-		message.member.roles.add(role);
-		message.reply("Member Role Added!");
+	if (command === "quote") {
+		let quote = QUOTE_LIST[Math.floor(Math.random() * QUOTE_LIST.length)];
+		message.channel.send(quote);
 	}
 
 });
