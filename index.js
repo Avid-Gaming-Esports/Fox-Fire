@@ -1,39 +1,17 @@
+// IMPORTS
 const Discord = require("discord.js");
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-const { promisify } = require('util');
+const axios = require("axios");
 
+// PROJECT IMPORTS
 const creds = require('./client_secret.json');
 const config = require("./config.json");
+const constants = require('./constants');
+const prefix = "!";
 
-const axios = require("axios");
-const { strict } = require("assert");
 const client = new Discord.Client();
 
-const prefix = "!";
-const QUOTE_LIST = [
-	"Don't you trust me?",
-	"Play time's over.",
-	"Shall we?",
-	"Indulge me.",
-	"How tempting.",
-	"Don't hold back.",
-	"Tell me a secret.",
-	"Don't you trust me?",
-	"I know what they desire.",
-	"Play time's over.",
-	"They're mine now.",
-	"It's too late for mercy.",
-	"Let's have some real fun.",
-	"No one will stand in my way.",
-	"They've exhausted their use.",
-	"If you'd like to play with me, you'd better be sure you know the game.",
-	"Come try your luck, if you think you're in my league.",
-	"Should I make your pulse rise? Or... STOP!",
-]
-
 const longPoll = function () {
-	// console.log("isActive: " + isActive);
-
 	const loc = client.channels.cache.get('772345686158082068');
 	const twImg1 = 'https://images.fastcompany.net/image/upload/w_596,c_limit,q_auto:' +
 		'best,f_auto/wp-cms/uploads/2019/09/3-twitch-is-rebranding-for-the-first-time.jpg';
@@ -81,74 +59,87 @@ client.on("message", async function (message) {
 	const args = commandBody.split(' ');
 	const command = args.shift().toLowerCase();
 
-	if (command === "autoassign") {
-		// let role = message.guild.roles.cache.find(r => r.name === "Member");
-		// message.reply(role.toString())
-		// let guild = message.guild;
-		message.reply("Autoassign method [not implemented yet]");
-		// guild.members.filter(member => member.roles.array().length > 0).forEach(member => member.addRole(role));
-	} else if (command === "quote") {
-		let quote = QUOTE_LIST[Math.floor(Math.random() * QUOTE_LIST.length)];
-		message.channel.send(quote);
-	} else if (command === "powerrank") {
-		const res = await accessSpreadSheet();
-		let resp = "";
-		let roles = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "SUPPORT"]
-		if (args[0] === "all") {
-			resp += "Pulling top 10 power rankings: " + "\n" +
-				"#####################################";
-			for (let i = 1; i < 11; i++) {
-				let idx = i.toString();
-				let role = res[idx][2].charAt(0).toUpperCase() + res[idx][2].toLowerCase().slice(1)
-				resp += "\n" + idx + " : " + res[idx][0] + ' (' + role + ') ' + ' (' + res[idx][1] + ') '
-			}
-		} else if (roles.includes(args[0].toUpperCase())) {
-			let curr = 1
-			let role = args[0].toUpperCase()
-			resp += "Pulling top 5 players in " + role + "\n"
-			let filtered = Object.keys(res).reduce(function (filtered, key) {
-				if (res[key][2] === role) {
-					filtered[curr] = res[key]
-					curr += 1
+	// Command handler
+	switch(command){
+		case "autoassign":
+			message.reply("Autoassign method [not implemented yet]");
+			break;
+		case "quote":
+			let quote = constants.QUOTE_LIST[Math.floor(Math.random() * constants.QUOTE_LIST.length)];
+			message.channel.send(quote);
+			break;
+		case "powerrank":
+			let resp = "";
+			let selector = args[0].toUpperCase()
+			if (constants.VALID_ROLES.includes(selector)) {
+				const res = await accessSpreadSheet();
+				selector = constants.ROLE_MAP[args[0].toUpperCase()]
+				// console.log(selector)
+				switch(selector) {
+					case "ALL":
+						resp += "Pulling top 10 power rankings: " + "\n" +
+							"#####################################";
+						for (let i = 1; i < 11; i++) {
+							let idx = i.toString();
+							let role = res[idx][2].charAt(0).toUpperCase() + res[idx][2].toLowerCase().slice(1)
+							resp += "\n" + idx + " : " + res[idx][0] + ' (' + role + ') ' + ' (' + res[idx][1] + ') '
+						}
+						break
+					default:
+						let curr = 1
+						resp += "Pulling top 5 players in " + selector + "\n"
+						let filtered = Object.keys(res).reduce(function (filtered, key) {
+							if (res[key][2] === selector) {
+								filtered[curr] = res[key]
+								curr += 1
+							}
+							return filtered;
+						}, {});
+						for (let i = 1; i < 6; i++) {
+							let idx = i.toString();
+							let role = selector.charAt(0).toUpperCase() + selector.toLowerCase().slice(1)
+							let name = filtered[idx][0].charAt(0).toUpperCase() + filtered[idx][0].slice(1)
+							resp += "\n" + idx + " : " + name + ' (' + role + ') '
+						}
+						break
 				}
-				return filtered;
-			}, {});
-			for (let i = 1; i < 6; i++) {
-				let idx = i.toString();
-				let role = filtered[idx][2].charAt(0).toUpperCase() + filtered[idx][2].toLowerCase().slice(1)
-				resp += "\n" + idx + " : " + filtered[idx][0] + ' (' + role + ') '
+			} else {
+				resp = "Not a valid argument."
 			}
-		}
-		message.channel.send(resp)
-	} else if (command === "pullstream") {	
-		const loc = client.channels.cache.get('772345686158082068');
-		const twImg1 = 'https://images.fastcompany.net/image/upload/w_596,c_limit,q_auto:' +
-			'best,f_auto/wp-cms/uploads/2019/09/3-twitch-is-rebranding-for-the-first-time.jpg';
-		const twImg2 = 'https://blog.twitch.tv/assets/uploads/03-glitch.jpg';
-
-		axios.defaults.headers.common["Client-ID"] = config.TWITCH_ID;
-		axios.defaults.headers.common["Authorization"] = config.TWITCH_OAUTH;
-
-		axios
-			.get("https://api.twitch.tv/helix/search/channels?query=avidgamingesports")
-			.then(response => {
-				currStream = response.data.data[0]
-				const linkEmbed = new Discord.MessageEmbed()
-					.setColor('#0099ff')
-					.setTitle(currStream.title)
-					.setURL('https://www.twitch.tv/avidgamingesports')
-					.setAuthor('avidgamingesports', twImg1,
-						'https://www.twitch.tv/avidgamingesports')
-					.setThumbnail(twImg2)
-					.setTimestamp()
-				loc.send('AvidGamingEsports is now live! ' + `@everyone`)
-				loc.send(linkEmbed)
-			})
-			.catch(_error => {
-				console.log("Failed to fetch Twitch API.");
-			});
-		}
-
+			message.channel.send(resp)
+			break;
+		case "pullstream":
+			const loc = client.channels.cache.get('772345686158082068');
+			const twImg1 = 'https://images.fastcompany.net/image/upload/w_596,c_limit,q_auto:' +
+				'best,f_auto/wp-cms/uploads/2019/09/3-twitch-is-rebranding-for-the-first-time.jpg';
+			const twImg2 = 'https://blog.twitch.tv/assets/uploads/03-glitch.jpg';
+	
+			axios.defaults.headers.common["Client-ID"] = config.TWITCH_ID;
+			axios.defaults.headers.common["Authorization"] = config.TWITCH_OAUTH;
+	
+			axios
+				.get("https://api.twitch.tv/helix/search/channels?query=avidgamingesports")
+				.then(response => {
+					currStream = response.data.data[0]
+					const linkEmbed = new Discord.MessageEmbed()
+						.setColor('#0099ff')
+						.setTitle(currStream.title)
+						.setURL('https://www.twitch.tv/avidgamingesports')
+						.setAuthor('avidgamingesports', twImg1,
+							'https://www.twitch.tv/avidgamingesports')
+						.setThumbnail(twImg2)
+						.setTimestamp()
+					loc.send('AvidGamingEsports is now live! ' + `@everyone`)
+					loc.send(linkEmbed)
+				})
+				.catch(_error => {
+					console.log("Failed to fetch Twitch API.");
+				});
+			break;
+		default:
+			message.channel.send("Not a valid command.")
+			break;
+	}
 });
 
 client.on('guildMemberAdd', (guildMember) => {
