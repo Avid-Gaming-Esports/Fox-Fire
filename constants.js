@@ -55,10 +55,18 @@ const HELP_MSG = "The following commands are available: \n \n" +
 
 const PREFIX = "!";
 
+const TW_IMG1 = 'https://images.fastcompany.net/image/upload/w_596,c_limit,q_auto:' +
+	'best,f_auto/wp-cms/uploads/2019/09/3-twitch-is-rebranding-for-the-first-time.jpg';
+const TW_IMG2 = 'https://blog.twitch.tv/assets/uploads/03-glitch.jpg';
+const TW_URL = 'https://blog.twitch.tv/assets/uploads/03-glitch.jpg';
+
 module.exports = Object.freeze({
 	VALID_ROLES: VALID_ROLES,
 	ROLE_MAP: ROLE_MAP,
 	QUOTE_LIST: QUOTE_LIST,
 	PREFIX: PREFIX,
-	HELP_MSG: HELP_MSG
+	HELP_MSG: HELP_MSG,
+	TW_IMG1: TW_IMG1,
+	TW_IMG2: TW_IMG2,
+	TW_URL: TW_URL
 });

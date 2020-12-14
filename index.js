@@ -79,9 +79,6 @@ client.on("message", async function (message) {
 			break;
 		case "pullstream":
 			const loc = client.channels.cache.get('772345686158082068');
-			const twImg1 = 'https://images.fastcompany.net/image/upload/w_596,c_limit,q_auto:' +
-				'best,f_auto/wp-cms/uploads/2019/09/3-twitch-is-rebranding-for-the-first-time.jpg';
-			const twImg2 = 'https://blog.twitch.tv/assets/uploads/03-glitch.jpg';
 
 			axios.defaults.headers.common["Client-ID"] = config.TWITCH_ID;
 			axios.defaults.headers.common["Authorization"] = config.TWITCH_OAUTH;
@@ -93,10 +90,10 @@ client.on("message", async function (message) {
 					const linkEmbed = new Discord.MessageEmbed()
 						.setColor('#0099ff')
 						.setTitle(currStream.title)
-						.setURL('https://www.twitch.tv/avidgamingesports')
-						.setAuthor('avidgamingesports', twImg1,
-							'https://www.twitch.tv/avidgamingesports')
-						.setThumbnail(twImg2)
+						.setURL(constants.TW_URL)
+						.setAuthor('avidgamingesports', constants.TW_IMG1,
+							constants.TW_URL)
+						.setThumbnail(constants.TW_IMG2)
 						.setTimestamp()
 					loc.send('AvidGamingEsports is now live! ' + `@everyone`)
 					loc.send(linkEmbed)
@@ -164,9 +161,6 @@ async function accessSpreadSheet() {
 
 function longPoll() {
 	const loc = client.channels.cache.get('772345686158082068');
-	const twImg1 = 'https://images.fastcompany.net/image/upload/w_596,c_limit,q_auto:' +
-		'best,f_auto/wp-cms/uploads/2019/09/3-twitch-is-rebranding-for-the-first-time.jpg';
-	const twImg2 = 'https://blog.twitch.tv/assets/uploads/03-glitch.jpg';
 
 	axios.defaults.headers.common["Client-ID"] = config.TWITCH_ID;
 	axios.defaults.headers.common["Authorization"] = config.TWITCH_OAUTH;
@@ -180,10 +174,10 @@ function longPoll() {
 					const linkEmbed = new Discord.MessageEmbed()
 						.setColor('#0099ff')
 						.setTitle(currStream.title)
-						.setURL('https://www.twitch.tv/avidgamingesports')
-						.setAuthor('avidgamingesports', twImg1,
-							'https://www.twitch.tv/avidgamingesports')
-						.setThumbnail(twImg2)
+						.setURL(constants.TW_URL)
+						.setAuthor('avidgamingesports', constants.TW_IMG1,
+							constants.TW_URL)
+						.setThumbnail(constants.TW_IMG2)
 						.setTimestamp()
 					loc.send('AvidGamingEsports is now live! ' + `@everyone`)
 					loc.send(linkEmbed)
