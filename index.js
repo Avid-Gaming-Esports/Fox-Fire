@@ -15,7 +15,7 @@ const tournamentApi = axios.create({
 	baseURL: 'https://dtmwra1jsgyb0.cloudfront.net/'
 })
 
-let isActive = false
+let isActive = false;
 
 client.on('ready', function () {
 	client.setInterval(longPoll, 60000);
@@ -39,10 +39,10 @@ client.on("message", async function (message) {
 			break;
 		case "powerrank":
 			let resp = "";
-			let selector = args[0].toUpperCase()
+			let selector = args[0].toUpperCase();
 			if (constants.VALID_ROLES.includes(selector)) {
 				const res = await accessSpreadSheet();
-				selector = constants.ROLE_MAP[args[0].toUpperCase()]
+				selector = constants.ROLE_MAP[args[0].toUpperCase()];
 				// console.log(selector)
 				switch (selector) {
 					case "ALL":
@@ -50,32 +50,32 @@ client.on("message", async function (message) {
 							"#####################################";
 						for (let i = 1; i < 11; i++) {
 							let idx = i.toString();
-							let role = res[idx][2].charAt(0).toUpperCase() + res[idx][2].toLowerCase().slice(1)
-							resp += "\n" + idx + " : " + res[idx][0] + ' (' + role + ') ' + ' (' + res[idx][1] + ') '
+							let role = res[idx][2].charAt(0).toUpperCase() + res[idx][2].toLowerCase().slice(1);
+							resp += "\n" + idx + " : " + res[idx][0] + ' (' + role + ') ' + ' (' + res[idx][1] + ') ';
 						}
-						break
+						break;
 					default:
-						let curr = 1
-						resp += "Pulling top 5 players in " + selector + "\n"
+						let curr = 1;
+						resp += "Pulling top 5 players in " + selector + "\n";
 						let filtered = Object.keys(res).reduce(function (filtered, key) {
 							if (res[key][2] === selector) {
-								filtered[curr] = res[key]
-								curr += 1
+								filtered[curr] = res[key];
+								curr += 1;
 							}
 							return filtered;
 						}, {});
 						for (let i = 1; i < 6; i++) {
 							let idx = i.toString();
-							let role = selector.charAt(0).toUpperCase() + selector.toLowerCase().slice(1)
-							let name = filtered[idx][0].charAt(0).toUpperCase() + filtered[idx][0].slice(1)
-							resp += "\n" + idx + " : " + name + ' (' + role + ') '
+							let role = selector.charAt(0).toUpperCase() + selector.toLowerCase().slice(1);
+							let name = filtered[idx][0].charAt(0).toUpperCase() + filtered[idx][0].slice(1);
+							resp += "\n" + idx + " : " + name + ' (' + role + ') ';
 						}
-						break
+						break;
 				}
 			} else {
 				resp = "Not a valid argument. Format is as follows: !powerrank [ALL or POSITION]. "
 			}
-			message.channel.send(resp)
+			message.channel.send(resp);
 			break;
 		case "pullstream":
 			const loc = client.channels.cache.get('772345686158082068');
@@ -148,9 +148,9 @@ async function accessSpreadSheet() {
 	const rows = await sheet.getRows({
 		offset: 4,
 		limit: 100
-	})
+	});
 
-	res = {}
+	res = {};
 
 	rows.forEach((row) => {
 		let raws = row._rawData
