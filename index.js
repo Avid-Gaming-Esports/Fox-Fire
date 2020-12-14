@@ -1,49 +1,19 @@
 // IMPORTS
+const axios = require("axios");
+const battlefy = require("battlefy-api")
 const Discord = require("discord.js");
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-const axios = require("axios");
 
 // PROJECT IMPORTS
 const creds = require('./client_secret.json');
 const config = require("./config.json");
 const constants = require('./constants');
-const prefix = "!";
 
 const client = new Discord.Client();
 
-const longPoll = function () {
-	const loc = client.channels.cache.get('772345686158082068');
-	const twImg1 = 'https://images.fastcompany.net/image/upload/w_596,c_limit,q_auto:' +
-		'best,f_auto/wp-cms/uploads/2019/09/3-twitch-is-rebranding-for-the-first-time.jpg';
-	const twImg2 = 'https://blog.twitch.tv/assets/uploads/03-glitch.jpg';
-
-	axios.defaults.headers.common["Client-ID"] = config.TWITCH_ID;
-	axios.defaults.headers.common["Authorization"] = config.TWITCH_OAUTH;
-
-	axios
-		.get("https://api.twitch.tv/helix/search/channels?query=avidgamingesports")
-		.then(response => {
-			if (!isActive) {
-				currStream = response.data.data[0]
-				if (currStream.is_live) {
-					const linkEmbed = new Discord.MessageEmbed()
-						.setColor('#0099ff')
-						.setTitle(currStream.title)
-						.setURL('https://www.twitch.tv/avidgamingesports')
-						.setAuthor('avidgamingesports', twImg1,
-							'https://www.twitch.tv/avidgamingesports')
-						.setThumbnail(twImg2)
-						.setTimestamp()
-					loc.send('AvidGamingEsports is now live! ' + `@everyone`)
-					loc.send(linkEmbed)
-				}
-			}
-			isActive = response.data.data[0].is_live
-		})
-		.catch(_error => {
-			console.log("Failed to fetch Twitch API.");
-		});
-}
+const tournamentApi = axios.create({
+	baseURL: 'https://dtmwra1jsgyb0.cloudfront.net/'
+})
 
 let isActive = false
 
@@ -53,20 +23,19 @@ client.on('ready', function () {
 
 client.on("message", async function (message) {
 	if (message.author.bot) return;
-	if (!message.content.startsWith(prefix)) return;
+	if (!message.content.startsWith(constants.PREFIX)) return;
 
-	const commandBody = message.content.slice(prefix.length);
+	const commandBody = message.content.slice(constants.PREFIX.length);
 	const args = commandBody.split(' ');
 	const command = args.shift().toLowerCase();
 
 	// Command handler
-	switch(command){
+	switch (command) {
 		case "autoassign":
 			message.reply("Autoassign method [not implemented yet]");
 			break;
-		case "quote":
-			let quote = constants.QUOTE_LIST[Math.floor(Math.random() * constants.QUOTE_LIST.length)];
-			message.channel.send(quote);
+		case "ff":
+			message.channel.send(constants.HELP_MSG)
 			break;
 		case "powerrank":
 			let resp = "";
@@ -75,7 +44,7 @@ client.on("message", async function (message) {
 				const res = await accessSpreadSheet();
 				selector = constants.ROLE_MAP[args[0].toUpperCase()]
 				// console.log(selector)
-				switch(selector) {
+				switch (selector) {
 					case "ALL":
 						resp += "Pulling top 10 power rankings: " + "\n" +
 							"#####################################";
@@ -104,7 +73,7 @@ client.on("message", async function (message) {
 						break
 				}
 			} else {
-				resp = "Not a valid argument."
+				resp = "Not a valid argument. Format is as follows: !powerrank [ALL or POSITION]. "
 			}
 			message.channel.send(resp)
 			break;
@@ -113,10 +82,10 @@ client.on("message", async function (message) {
 			const twImg1 = 'https://images.fastcompany.net/image/upload/w_596,c_limit,q_auto:' +
 				'best,f_auto/wp-cms/uploads/2019/09/3-twitch-is-rebranding-for-the-first-time.jpg';
 			const twImg2 = 'https://blog.twitch.tv/assets/uploads/03-glitch.jpg';
-	
+
 			axios.defaults.headers.common["Client-ID"] = config.TWITCH_ID;
 			axios.defaults.headers.common["Authorization"] = config.TWITCH_OAUTH;
-	
+
 			axios
 				.get("https://api.twitch.tv/helix/search/channels?query=avidgamingesports")
 				.then(response => {
@@ -136,8 +105,27 @@ client.on("message", async function (message) {
 					console.log("Failed to fetch Twitch API.");
 				});
 			break;
+		case "quote":
+			let quote = constants.QUOTE_LIST[Math.floor(Math.random() * constants.QUOTE_LIST.length)];
+			message.channel.send(quote);
+			break;
+		case "standings":
+			let res = await getTournamentStageMatches("5fb86cf65caa4f5e4bc861fd");
+			let sorted = Object.keys(res).map(function(key) {
+				return [key, res[key]];
+			});
+			sorted.sort(function(first, second) {
+				return second[1][0] - first[1][0];
+			}) 
+			let standings = "Here are the current standings: \n \n";
+			for (item in sorted) {
+				standings += "*" + (parseInt(item)+1).toString() + ": " + sorted[item][0] 
+					+ "* (W: " + sorted[item][1][0] + " L: " + sorted[item][1][1] + ")\n";
+			}
+			message.channel.send(standings);
+			break;
 		default:
-			message.channel.send("Not a valid command.")
+			message.channel.send("Not a valid command. Type !ff for help. ");
 			break;
 	}
 });
@@ -172,4 +160,71 @@ async function accessSpreadSheet() {
 		res[raws[5]] = [raws[1], raws[2], raws[3]]
 	})
 	return res
+}
+
+function longPoll() {
+	const loc = client.channels.cache.get('772345686158082068');
+	const twImg1 = 'https://images.fastcompany.net/image/upload/w_596,c_limit,q_auto:' +
+		'best,f_auto/wp-cms/uploads/2019/09/3-twitch-is-rebranding-for-the-first-time.jpg';
+	const twImg2 = 'https://blog.twitch.tv/assets/uploads/03-glitch.jpg';
+
+	axios.defaults.headers.common["Client-ID"] = config.TWITCH_ID;
+	axios.defaults.headers.common["Authorization"] = config.TWITCH_OAUTH;
+
+	axios
+		.get("https://api.twitch.tv/helix/search/channels?query=avidgamingesports")
+		.then(response => {
+			if (!isActive) {
+				currStream = response.data.data[0]
+				if (currStream.is_live) {
+					const linkEmbed = new Discord.MessageEmbed()
+						.setColor('#0099ff')
+						.setTitle(currStream.title)
+						.setURL('https://www.twitch.tv/avidgamingesports')
+						.setAuthor('avidgamingesports', twImg1,
+							'https://www.twitch.tv/avidgamingesports')
+						.setThumbnail(twImg2)
+						.setTimestamp()
+					loc.send('AvidGamingEsports is now live! ' + `@everyone`)
+					loc.send(linkEmbed)
+				}
+			}
+			isActive = response.data.data[0].is_live
+		})
+		.catch(_error => {
+			console.log("Failed to fetch Twitch API.");
+		});
+}
+
+
+async function getTournamentStageMatches(stage) {
+	const response = await tournamentApi.get(`stages/${stage}/matches`);
+	let teams = {
+		"Rubber Ducky Team" : [0, 0],
+		"Luck of the Draw" : [0, 0],
+		"ULTIMATE DAN" : [0, 0],
+		"On the Spot" : [0, 0],
+		"Mailbox's Angels" : [0, 0],
+		"BaeDCarry Fan Club" : [0, 0],
+		"Natural Big Boys Club" : [0, 0],
+		"Frank n' Beans" : [0, 0],
+		"LAMAR JACKSON FAN CLUB" : [0, 0],
+		"Big Shmeat Gang" : [0, 0]
+	}
+	for (match in response.data) {
+		var winner;
+		if (response.data[match].top.winner === true) {
+			winner = 'top';
+			teams[response.data[match].top.team.name][0] += 1;
+			teams[response.data[match].bottom.team.name][1] += 1;
+		} else if (response.data[match].top.winner === false) {
+			winner = 'bottom';
+			teams[response.data[match].top.team.name][1] += 1;
+			teams[response.data[match].bottom.team.name][0] += 1;
+		} else {
+			winner = 'undefined';
+		}
+		response.data[match].winner = winner;
+	}
+	return teams;
 }

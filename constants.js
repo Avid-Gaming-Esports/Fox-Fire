@@ -44,8 +44,21 @@ const QUOTE_LIST = [
 	"Should I make your pulse rise? Or... STOP!",
 ]
 
+const HELP_MSG = "The following commands are available: \n \n" + 
+"*!autoassign*: Not implemented yet. \n" + 
+"*!ff*: Displays this help message. \n" + 
+"*!powerrank*: Returns powerranking for AVG's League Tournament. \n" +
+"*!quote*: Returns a random Ahri quote. \n" + 
+"*!standings*: Returns team standings for AVG's League Tournament. \n \n" + 
+"Fox-Fire is developed and maintained by our Dev team. \n" + 
+"See the code here: https://github.com/avidgaming/Fox-Fire";
+
+const PREFIX = "!";
+
 module.exports = Object.freeze({
 	VALID_ROLES: VALID_ROLES,
 	ROLE_MAP: ROLE_MAP,
-	QUOTE_LIST: QUOTE_LIST
+	QUOTE_LIST: QUOTE_LIST,
+	PREFIX: PREFIX,
+	HELP_MSG: HELP_MSG
 });
