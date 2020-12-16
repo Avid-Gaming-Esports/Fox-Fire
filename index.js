@@ -112,7 +112,7 @@ client.on("message", async function (message) {
 				return [key, res[key]];
 			});
 			sorted.sort(function(first, second) {
-				return second[1][0] - first[1][0];
+				return (second[1][0] - second[1][1]) - (first[1][0] - first[1][1]);
 			}) 
 			let standings = "Here are the current standings: \n \n";
 			for (item in sorted) {
