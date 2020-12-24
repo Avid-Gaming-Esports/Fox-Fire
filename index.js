@@ -34,11 +34,29 @@ client.on("message", async function (message) {
 		case "autoassign":
 			message.reply("Autoassign method [not implemented yet]");
 			break;
+		case "fa":
+			if (args[0] === undefined) {
+				return
+			}
+			let faverb = args[0].toLowerCase();
+			if (["join", "leave"].includes(faverb)) {
+				let role = message.guild.roles.cache.find(r => r.name === "Free Agent");
+				let member = message.member;
+				if (faverb === "join") {
+					member.roles.add(role);
+				} else {
+					member.roles.remove(role);
+				}
+			}
+			break;
 		case "ff":
 			message.channel.send(constants.HELP_MSG)
 			break;
 		case "powerrank":
 			let resp = "";
+			if (args[0] === undefined) {
+				return
+			}
 			let selector = args[0].toUpperCase();
 			if (constants.VALID_ROLES.includes(selector)) {
 				const res = await accessSpreadSheet();

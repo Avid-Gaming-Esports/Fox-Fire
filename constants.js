@@ -46,8 +46,9 @@ const QUOTE_LIST = [
 
 const HELP_MSG = "The following commands are available: \n \n" + 
 "*!autoassign*: Not implemented yet. \n" + 
+"*!fa [leave, join]*: Controls admission to Free Agent group. \n" + 
 "*!ff*: Displays this help message. \n" + 
-"*!powerrank*: Returns powerranking for AVG's League Tournament. \n" +
+"*!powerrank [position, all]*: Returns powerranking for AVG's League Tournament. \n" +
 "*!quote*: Returns a random Ahri quote. \n" + 
 "*!standings*: Returns team standings for AVG's League Tournament. \n \n" + 
 "Fox-Fire is developed and maintained by our Dev team. \n" + 
