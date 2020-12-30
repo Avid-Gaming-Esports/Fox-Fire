@@ -11,12 +11,14 @@ const constants = require('./constants');
 
 const client = new Discord.Client();
 
+// Using battlefy api endpoint
 const tournamentApi = axios.create({
 	baseURL: 'https://dtmwra1jsgyb0.cloudfront.net/'
 })
 
 let isActive = false;
 
+// Poll twitch stream every minute
 client.on('ready', function () {
 	client.setInterval(longPoll, 60000);
 });
@@ -28,6 +30,7 @@ client.on("message", async function (message) {
 	const commandBody = message.content.slice(constants.PREFIX.length);
 	const args = commandBody.split(' ');
 	const command = args.shift().toLowerCase();
+	let resp, selector;
 
 	// Command handler
 	switch (command) {
@@ -52,14 +55,39 @@ client.on("message", async function (message) {
 		case "ff":
 			message.channel.send(constants.HELP_MSG)
 			break;
-		case "powerrank":
-			let resp = "";
+		case "mh":
+			resp = "";
 			if (args[0] === undefined) {
-				return
+				return;
 			}
-			let selector = args[0].toUpperCase();
+			selector = args[0];
+			if (Object.keys(constants.TEAM_MAP).includes(selector)) {
+				let translated = constants.TEAM_MAP[selector];
+				let res = await getTournamentStageMatches("5fb86cf65caa4f5e4bc861fd");
+				resp += "Pulling match history for " + translated +" : \n" +
+					"##################################### \n";
+				resp += "W: " + res[translated][0].length + " L: " + 
+					res[translated][1].length + "\n";
+				for (let i = 0; i < res[translated][0].length; i++) {
+					resp += res[translated][0][i] + " **Win** \n";
+				}
+				resp += "------------------------------------- \n"
+				for (let i = 0; i < res[translated][1].length; i++) {
+					resp += res[translated][1][i] + " **Loss** \n";
+				}
+			} else {
+				resp = "Not a valid argument. Format is as follows: !mh [TEAM]. ";
+			}
+			message.channel.send(resp);
+			break;
+		case "pr":
+			resp = "";
+			if (args[0] === undefined) {
+				return;
+			}
+			selector = args[0].toUpperCase();
 			if (constants.VALID_ROLES.includes(selector)) {
-				const res = await accessSpreadSheet();
+				const res = await accessPlayerSpreadSheet();
 				selector = constants.ROLE_MAP[args[0].toUpperCase()];
 				// console.log(selector)
 				switch (selector) {
@@ -90,8 +118,30 @@ client.on("message", async function (message) {
 						}
 						break;
 				}
+			} else if (selector === "TEAM" || selector === "TEAMS") {
+				if (args.length > 2) {
+					resp = "Not a valid argument. Format is as follows: !pr [ALL or POSITION]. "
+				} else if (args.length === 2) {
+					if (args[1] === "avg" || args[1] === "average" || args[1] === "per-player") {
+						const res = await accessTeamSpreadSheet("avg");
+						resp += "Pulling teams based on average player score:\n";
+						for (let i = 1; i < 11; i++) {
+							let idx = i.toString();
+							resp += "\n" + idx + " : " + constants.TEAM_MAP[res[idx][0]] + " (" + Number.parseFloat(res[idx][1]).toFixed(1) + " / Player)";
+						}
+					} else {
+						resp = "Not a valid argument. Format is as follows: !pr [ALL or POSITION]. "
+					}
+				} else {
+					const res = await accessTeamSpreadSheet("sum");
+					resp += "Pulling teams based on sum of player score:\n";
+					for (let i = 1; i < 11; i++) {
+						let idx = i.toString();
+						resp += "\n" + idx + " : " + constants.TEAM_MAP[res[idx][0]] + " (" + Number.parseFloat(res[idx][1]).toFixed(1) + ")";
+					}
+				}
 			} else {
-				resp = "Not a valid argument. Format is as follows: !powerrank [ALL or POSITION]. "
+				resp = "Not a valid argument. Format is as follows: !pr [ALL or POSITION or TEAM]. "
 			}
 			message.channel.send(resp);
 			break;
@@ -127,11 +177,19 @@ client.on("message", async function (message) {
 		case "standings":
 			let res = await getTournamentStageMatches("5fb86cf65caa4f5e4bc861fd");
 			let sorted = Object.keys(res).map(function(key) {
-				return [key, res[key]];
+				return [key, [res[key][0].length, res[key][1].length]];
 			});
+			console.log(sorted)
+			// First = Wins, Second = Losses
+			// Sort first based on wins, second on who has lost more
 			sorted.sort(function(first, second) {
-				return (second[1][0] - second[1][1]) - (first[1][0] - first[1][1]);
+				if (first[1][0] === second[1][0]) {
+					return (first[1][1] - second[1][1])
+				} else {
+					return (second[1][0] - first[1][0]);
+				}
 			}) 
+			console.log(sorted);
 			let standings = "Here are the current standings: \n \n";
 			for (item in sorted) {
 				standings += "*" + (parseInt(item)+1).toString() + ": " + sorted[item][0] 
@@ -140,7 +198,7 @@ client.on("message", async function (message) {
 			message.channel.send(standings);
 			break;
 		default:
-			message.channel.send("Not a valid command. Type !ff for help. ");
+			// message.channel.send("Not a valid command. Type !ff for help. ");
 			break;
 	}
 });
@@ -154,7 +212,7 @@ client.on('guildMemberAdd', (guildMember) => {
 
 client.login(config.BOT_TOKEN);
 
-async function accessSpreadSheet() {
+async function accessPlayerSpreadSheet() {
 	const doc = new GoogleSpreadsheet('1oiKPuIbBt1_4U8IC0jIKz9_IMl4V5_PAqA_jrhdAsuo');
 	await doc.useServiceAccountAuth({
 		client_email: creds.client_email,
@@ -171,10 +229,40 @@ async function accessSpreadSheet() {
 	res = {};
 
 	rows.forEach((row) => {
-		let raws = row._rawData
-		res[raws[5]] = [raws[1], raws[2], raws[3]]
+		let raws = row._rawData;
+		res[raws[5]] = [raws[1], raws[2], raws[3]];
 	})
-	return res
+	return res;
+}
+
+async function accessTeamSpreadSheet(type) {
+	const doc = new GoogleSpreadsheet('1oiKPuIbBt1_4U8IC0jIKz9_IMl4V5_PAqA_jrhdAsuo');
+	await doc.useServiceAccountAuth({
+		client_email: creds.client_email,
+		private_key: creds.private_key,
+	});
+	await doc.loadInfo();
+
+	const sheet = doc.sheetsById[1064544130];
+	const rows = await sheet.getRows({
+		offset: 4,
+		limit: 10
+	});
+
+	res = {};
+
+	if (type === "sum") {
+		rows.forEach((row) => {
+			let raws = row._rawData;
+			res[raws[5]] = [raws[6], raws[7]];
+		})
+	} else {
+		rows.forEach((row) => {
+			let raws = row._rawData;
+			res[raws[9]] = [raws[10], raws[11]];
+		})
+	}
+	return res;
 }
 
 function longPoll() {
@@ -208,31 +296,30 @@ function longPoll() {
 		});
 }
 
-
 async function getTournamentStageMatches(stage) {
 	const response = await tournamentApi.get(`stages/${stage}/matches`);
 	let teams = {
-		"Rubber Ducky Team" : [0, 0],
-		"Luck of the Draw" : [0, 0],
-		"ULTIMATE DAN" : [0, 0],
-		"On the Spot" : [0, 0],
-		"Mailbox's Angels" : [0, 0],
-		"BaeDCarry Fan Club" : [0, 0],
-		"Natural Big Boys Club" : [0, 0],
-		"Frank n' Beans" : [0, 0],
-		"LAMAR JACKSON FAN CLUB" : [0, 0],
-		"Big Shmeat Gang" : [0, 0]
+		"Rubber Ducky Team" : [[], []],
+		"Luck of the Draw" : [[], []],
+		"ULTIMATE DAN" : [[], []],
+		"On the Spot" : [[], []],
+		"Mailbox's Angels" : [[], []],
+		"BaeDCarry Fan Club" : [[], []],
+		"Natural Big Boys Club" : [[], []],
+		"Frank n' Beans" : [[], []],
+		"LAMAR JACKSON FAN CLUB" : [[], []],
+		"Big Shmeat Gang" : [[], []]
 	}
 	for (match in response.data) {
 		var winner;
 		if (response.data[match].top.winner === true) {
 			winner = 'top';
-			teams[response.data[match].top.team.name][0] += 1;
-			teams[response.data[match].bottom.team.name][1] += 1;
+			teams[response.data[match].top.team.name][0].push(response.data[match].bottom.team.name);
+			teams[response.data[match].bottom.team.name][1].push(response.data[match].top.team.name);
 		} else if (response.data[match].top.winner === false) {
 			winner = 'bottom';
-			teams[response.data[match].top.team.name][1] += 1;
-			teams[response.data[match].bottom.team.name][0] += 1;
+			teams[response.data[match].top.team.name][1].push(response.data[match].bottom.team.name);
+			teams[response.data[match].bottom.team.name][0].push(response.data[match].top.team.name);
 		} else {
 			winner = 'undefined';
 		}
