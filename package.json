@@ -17,9 +17,10 @@
   },
   "homepage": "https://github.com/avidgaming/Fox-Fire#readme",
   "dependencies": {
-    "axios": "^0.21.0",
+    "axios": "^0.21.1",
     "battlefy-api": "^1.1.0",
     "discord.js": "^12.4.1",
-    "google-spreadsheet": "^3.0.14"
+    "google-spreadsheet": "^3.1.15",
+    "puppeteer": "^5.5.0"
   }
 }
