@@ -1,8 +1,8 @@
 // IMPORTS
 const axios = require("axios");
-const battlefy = require("battlefy-api")
 const Discord = require("discord.js");
 const { GoogleSpreadsheet } = require('google-spreadsheet');
+const puppeteer = require('puppeteer');
 
 // PROJECT IMPORTS
 const creds = require('./client_secret.json');
@@ -15,6 +15,9 @@ const client = new Discord.Client();
 const tournamentApi = axios.create({
 	baseURL: 'https://dtmwra1jsgyb0.cloudfront.net/'
 })
+
+// Delay Function
+const delay = ms => new Promise(res => setTimeout(res, ms));
 
 let isActive = false;
 
@@ -78,6 +81,40 @@ client.on("message", async function (message) {
 			} else {
 				resp = "Not a valid argument. Format is as follows: !mh [TEAM]. ";
 			}
+			message.channel.send(resp);
+			break;
+		case "pd":
+			if (args.length <= 1) {
+				return;
+			}
+			let T1 = args[0]
+			let T2 = args[1]
+			let MN = args[0] + 'VS' + args[1]
+			const browser = await puppeteer.launch({
+        headless: true,
+				'args' : [
+					'--no-sandbox',
+					'--disable-setuid-sandbox'
+				]
+			});
+			const page = await browser.newPage();
+			await page.goto('http://prodraft.leagueoflegends.com/');
+			await page.type('#blue_team_name', T1)
+			await page.type('#red_team_name', T2)
+			await page.type('#match_name', MN)
+			await page.click('#root > div > div > button');
+			await delay(1000);
+			
+			let blue = await page.$('#blue_team_name')
+			let red = await page.$('#red_team_name')
+			let match = await page.$('#match_name')
+
+			let blueTeam = await page.evaluate(el => el.value, blue)
+			let redTeam = await page.evaluate(el => el.value, red)
+			let matchTeam = await page.evaluate(el => el.value, match)
+			browser.close();
+			resp = T1 + ": " + blueTeam + '\n' + T2 + ": " + redTeam + 
+				'\n' + "Spec: " + matchTeam
 			message.channel.send(resp);
 			break;
 		case "pr":

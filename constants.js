@@ -7,21 +7,21 @@ const TEAM_MAP = {
 	"NBBC": "Natural Big Boys Club",
 	"RDT": "Rubber Ducky Team",
 	"LJFC": "LAMAR JACKSON FAN CLUB",
-	"BSG": "Big Schmeat Gang", 
+	"BSG": "Big Shmeat Gang", 
 	"BCFC": "BaeDCarry Fan Club", 
 	"MA": "Mailbox's Angels",
-	"OTS": "On The Spot", 
-	"UD": "Ultimate Dan",
-	"FnB": "Frank n' Beans",
+	"OTS": "On the Spot", 
+	"UD": "ULTIMATE DAN",
+	"FNB": "Frank n' Beans",
 	"Luck of the Draw": "Luck of the Draw",
 	"Natural Big Boys Club": "Natural Big Boys Club",
 	"Rubber Ducky Team": "Rubber Ducky Team",
 	"LAMAR JACKSON FAN CLUB": "LAMAR JACKSON FAN CLUB",
-	"Big Schmeat Gang": "Big Schmeat Gang", 
+	"Big Shmeat Gang": "Big Shmeat Gang", 
 	"BaeDCarry Fan Club": "BaeDCarry Fan Club", 
 	"Mailbox's Angels": "Mailbox's Angels",
-	"On The Spot": "On The Spot", 
-	"Ultimate Dan": "Ultimate Dan",
+	"On the Spot": "On the Spot", 
+	"ULTIMATE DAN": "ULTIMATE DAN",
 	"Frank n' Beans": "Frank n' Beans"
 }
 
@@ -80,10 +80,10 @@ const HELP_MSG = "The following commands are available: \n \n" +
 
 const PREFIX = "!";
 
-const TW_IMG1 = 'https://images.fastcompany.net/image/upload/w_596,c_limit,q_auto:' +
-	'best,f_auto/wp-cms/uploads/2019/09/3-twitch-is-rebranding-for-the-first-time.jpg';
-const TW_IMG2 = 'https://blog.twitch.tv/assets/uploads/03-glitch.jpg';
-const TW_URL = 'https://www.twitch.tv/avidgamingesports';
+const TW_IMG1 = "https://images.fastcompany.net/image/upload/w_596,c_limit,q_auto:" +
+	"best,f_auto/wp-cms/uploads/2019/09/3-twitch-is-rebranding-for-the-first-time.jpg";
+const TW_IMG2 = "https://blog.twitch.tv/assets/uploads/03-glitch.jpg";
+const TW_URL = "https://www.twitch.tv/avidgamingesports";
 
 module.exports = Object.freeze({
 	VALID_ROLES: VALID_ROLES,
