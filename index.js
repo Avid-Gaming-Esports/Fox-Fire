@@ -90,7 +90,7 @@ client.on("message", async function(message) {
       }
       message.channel.send(resp);
       break;
-    case "ld":
+    case "dl":
       if (args.length <= 1) {
         return;
       }
