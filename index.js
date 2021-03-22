@@ -2,12 +2,12 @@
 const axios = require("axios");
 const Discord = require("discord.js");
 const { GoogleSpreadsheet } = require("google-spreadsheet");
-const puppeteer = require("puppeteer");
 
 // PROJECT IMPORTS
 const creds = require("./client_secret.json");
 const config = require("./config.json");
 const constants = require("./constants");
+const draft = require("./drafting-utils");
 
 const client = new Discord.Client();
 
@@ -96,10 +96,10 @@ client.on("message", async function(message) {
       }
       let team1 = args[0];
       let team2 = args[1];
-      let blueBanCount = args[2];
-      let redBanCount = args[3];
+      let blueBanCount = (args[2] ? args[2] : 5);
+      let redBanCount = (args[3] ? args[3] : 5);
 
-      resp = await generateDraft(team1, team2, blueBanCount, redBanCount);
+      resp = await draft.generateDraft(team1, team2, blueBanCount, redBanCount);
       message.channel.send(resp);
       break;
     case "pr":

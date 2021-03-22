@@ -52,7 +52,7 @@ async function generateDraft(team1, team2, blueBanCount, redBanCount) {
 
   let link_elems = await page.$$("input");
   let links = await Promise.all(link_elems.map((cur) => page.evaluate((el) => el.value, cur)));
-  let res = `${team1}: ${links[0]}\n ${team2}: ${links[1]}\n Spec: ${links[2]}`;
+  let res = `${team1}: ${links[0]}\n${team2}: ${links[1]}\nSpec: ${links[2]}`;
 
   browser.close();
 
