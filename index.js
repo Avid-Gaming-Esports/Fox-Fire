@@ -90,16 +90,17 @@ client.on("message", async function(message) {
       }
       message.channel.send(resp);
       break;
-    case "pd":
+    case "ld":
       if (args.length <= 1) {
         return;
       }
       let team1 = args[0];
       let team2 = args[1];
-      let matchName = args[0] + "VS" + args[1];
+      let blueBanCount = args[2];
+      let redBanCount = args[3];
 
-	  resp = generateDraft(team1, team2, matchName);
-	  message.channel.send(resp);
+      resp = await generateDraft(team1, team2, blueBanCount, redBanCount);
+      message.channel.send(resp);
       break;
     case "pr":
       resp = "";
@@ -410,4 +411,3 @@ async function getTournamentStageMatches(stage) {
   }
   return teams;
 }
-
