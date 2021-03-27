@@ -104,6 +104,12 @@ const TW_IMG1 =
 const TW_IMG2 = "https://blog.twitch.tv/assets/uploads/03-glitch.jpg";
 const TW_URL = "https://www.twitch.tv/avidgamingesports";
 
+const SIGNUPS = {
+  "PLAYER": "<https://forms.gle/oofA6a4cDuMq3pkK6>",
+  "CAPTAIN": "<https://forms.gle/YTYngQfK4HVqbNTq8>"
+}
+const RULES = "<https://avid-alpha.wl.r.appspot.com/rules/avg-season-2>"
+
 module.exports = Object.freeze({
   VALID_ROLES: VALID_ROLES,
   ROLE_MAP: ROLE_MAP,
@@ -114,4 +120,6 @@ module.exports = Object.freeze({
   TW_IMG1: TW_IMG1,
   TW_IMG2: TW_IMG2,
   TW_URL: TW_URL,
+  SIGNUPS: SIGNUPS,
+  RULES: RULES
 });

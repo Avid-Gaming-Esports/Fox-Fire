@@ -16,15 +16,12 @@ const tournamentApi = axios.create({
   baseURL: "https://dtmwra1jsgyb0.cloudfront.net/"
 });
 
-// Delay Function
-const delay = ms => new Promise(res => setTimeout(res, ms));
-
 let isActive = false;
 
 // Poll twitch stream every minute
-client.on("ready", function() {
-  client.setInterval(longPoll, 60000);
-});
+// client.on("ready", function() {
+//   client.setInterval(longPoll, 60000);
+// });
 
 client.on("message", async function(message) {
   if (message.author.bot) return;
@@ -37,24 +34,24 @@ client.on("message", async function(message) {
 
   // Command handler
   switch (command) {
-    case "autoassign":
-      message.reply("Autoassign method [not implemented yet]");
+    case "avg-invite":
+      message.channel.send("https://discord.gg/q33MTAVdke");
       break;
-    case "fa":
-      if (args[0] === undefined) {
-        return;
-      }
-      let faverb = args[0].toLowerCase();
-      if (["join", "leave"].includes(faverb)) {
-        let role = message.guild.roles.cache.find(r => r.name === "Free Agent");
-        let member = message.member;
-        if (faverb === "join") {
-          member.roles.add(role);
-        } else {
-          member.roles.remove(role);
-        }
-      }
-      break;
+    // case "fa":
+    //   if (args[0] === undefined) {
+    //     return;
+    //   }
+    //   let faverb = args[0].toLowerCase();
+    //   if (["join", "leave"].includes(faverb)) {
+    //     let role = message.guild.roles.cache.find(r => r.name === "Free Agent");
+    //     let member = message.member;
+    //     if (faverb === "join") {
+    //       member.roles.add(role);
+    //     } else {
+    //       member.roles.remove(role);
+    //     }
+    //   }
+    //   break;
     case "ff":
       message.channel.send(constants.HELP_MSG);
       break;
@@ -101,6 +98,13 @@ client.on("message", async function(message) {
 
       resp = await draft.generateDraft(team1, team2, blueBanCount, redBanCount);
       message.channel.send(resp);
+      break;
+    case "league-rules":
+      message.channel.send("Rules: " + constants.RULES);
+      break;
+    case "league-signup":
+      message.channel.send("Players: " + constants.SIGNUPS.PLAYER);
+      message.channel.send("Captains: " + constants.SIGNUPS.CAPTAIN);
       break;
     case "pr":
       resp = "";
@@ -206,32 +210,32 @@ client.on("message", async function(message) {
       }
       message.channel.send(resp);
       break;
-    case "pullstream":
-      const loc = client.channels.cache.get("772345686158082068");
+    // case "pullstream":
+    //   const loc = client.channels.cache.get("772345686158082068");
 
-      axios.defaults.headers.common["Client-ID"] = config.TWITCH_ID;
-      axios.defaults.headers.common["Authorization"] = config.TWITCH_OAUTH;
+    //   axios.defaults.headers.common["Client-ID"] = config.TWITCH_ID;
+    //   axios.defaults.headers.common["Authorization"] = config.TWITCH_OAUTH;
 
-      axios
-        .get(
-          "https://api.twitch.tv/helix/search/channels?query=avidgamingesports"
-        )
-        .then(response => {
-          currStream = response.data.data[0];
-          const linkEmbed = new Discord.MessageEmbed()
-            .setColor("#0099ff")
-            .setTitle(currStream.title)
-            .setURL(constants.TW_URL)
-            .setAuthor("avidgamingesports", constants.TW_IMG1, constants.TW_URL)
-            .setThumbnail(constants.TW_IMG2)
-            .setTimestamp();
-          loc.send("AvidGamingEsports is now live! " + `@everyone`);
-          loc.send(linkEmbed);
-        })
-        .catch(_error => {
-          console.log("Failed to fetch Twitch API.");
-        });
-      break;
+    //   axios
+    //     .get(
+    //       "https://api.twitch.tv/helix/search/channels?query=avidgamingesports"
+    //     )
+    //     .then(response => {
+    //       currStream = response.data.data[0];
+    //       const linkEmbed = new Discord.MessageEmbed()
+    //         .setColor("#0099ff")
+    //         .setTitle(currStream.title)
+    //         .setURL(constants.TW_URL)
+    //         .setAuthor("avidgamingesports", constants.TW_IMG1, constants.TW_URL)
+    //         .setThumbnail(constants.TW_IMG2)
+    //         .setTimestamp();
+    //       loc.send("AvidGamingEsports is now live! " + `@everyone`);
+    //       loc.send(linkEmbed);
+    //     })
+    //     .catch(_error => {
+    //       console.log("Failed to fetch Twitch API.");
+    //     });
+    //   break;
     case "quote":
       let quote =
         constants.QUOTE_LIST[
