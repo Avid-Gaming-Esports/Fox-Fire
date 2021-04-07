@@ -63,7 +63,7 @@ client.on("message", async function(message) {
       selector = args[0];
       if (Object.keys(constants.TEAM_MAP).includes(selector)) {
         let translated = constants.TEAM_MAP[selector];
-        let res = await getTournamentStageMatches("5fb86cf65caa4f5e4bc861fd");
+        let res = await getTournamentStageMatches("605ecea334f4d511922a813c");
         resp +=
           "Pulling match history for " +
           translated +
@@ -244,11 +244,11 @@ client.on("message", async function(message) {
       message.channel.send(quote);
       break;
     case "standings":
-      let res = await getTournamentStageMatches("5fb86cf65caa4f5e4bc861fd");
+      let res = await getTournamentStageMatches("605ecea334f4d511922a813c");
       let sorted = Object.keys(res).map(function(key) {
         return [key, [res[key][0].length, res[key][1].length]];
       });
-      console.log(sorted);
+      // console.log(sorted);
       // First = Wins, Second = Losses
       // Sort first based on wins, second on who has lost more
       sorted.sort(function(first, second) {
@@ -258,7 +258,7 @@ client.on("message", async function(message) {
           return second[1][0] - first[1][0];
         }
       });
-      console.log(sorted);
+      // console.log(sorted);
       let standings = "Here are the current standings: \n \n";
       for (item in sorted) {
         standings +=
@@ -379,17 +379,20 @@ function longPoll() {
 async function getTournamentStageMatches(stage) {
   const response = await tournamentApi.get(`stages/${stage}/matches`);
   let teams = {
-    "Rubber Ducky Team": [[], []],
-    "Luck of the Draw": [[], []],
-    "ULTIMATE DAN": [[], []],
-    "On the Spot": [[], []],
-    "Mailbox's Angels": [[], []],
-    "BaeDCarry Fan Club": [[], []],
-    "Natural Big Boys Club": [[], []],
-    "Frank n' Beans": [[], []],
-    "LAMAR JACKSON FAN CLUB": [[], []],
-    "Big Shmeat Gang": [[], []]
+    // "Rubber Ducky Team": [[], []],
+    // "Luck of the Draw": [[], []],
+    // "ULTIMATE DAN": [[], []],
+    // "On the Spot": [[], []],
+    // "Mailbox's Angels": [[], []],
+    // "BaeDCarry Fan Club": [[], []],
+    // "Natural Big Boys Club": [[], []],
+    // "Frank n' Beans": [[], []],
+    // "LAMAR JACKSON FAN CLUB": [[], []],
+    // "Big Shmeat Gang": [[], []]
   };
+  Object.values(constants.TEAM_MAP_10).forEach(key => {
+    teams[key] = [[], []]
+  })
   for (match in response.data) {
     var winner;
     if (response.data[match].top.winner === true) {

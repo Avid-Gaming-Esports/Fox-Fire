@@ -20,26 +20,39 @@ const VALID_ROLES = [
 ];
 
 const TEAM_MAP = {
-  LotD: "Luck of the Draw",
-  NBBC: "Natural Big Boys Club",
-  RDT: "Rubber Ducky Team",
-  LJFC: "LAMAR JACKSON FAN CLUB",
-  BSG: "Big Shmeat Gang",
-  BCFC: "BaeDCarry Fan Club",
-  MA: "Mailbox's Angels",
-  OTS: "On the Spot",
-  UD: "ULTIMATE DAN",
-  FNB: "Frank n' Beans",
-  "Luck of the Draw": "Luck of the Draw",
-  "Natural Big Boys Club": "Natural Big Boys Club",
-  "Rubber Ducky Team": "Rubber Ducky Team",
-  "LAMAR JACKSON FAN CLUB": "LAMAR JACKSON FAN CLUB",
-  "Big Shmeat Gang": "Big Shmeat Gang",
-  "BaeDCarry Fan Club": "BaeDCarry Fan Club",
-  "Mailbox's Angels": "Mailbox's Angels",
-  "On the Spot": "On the Spot",
-  "ULTIMATE DAN": "ULTIMATE DAN",
-  "Frank n' Beans": "Frank n' Beans",
+  LE: "La Espada",
+  RV: "Royal Vagabonds",
+  INT: "Im Not Trying",
+  UPS: "United Parcel Service",
+  DBZ: "DaBabieZ",
+  BFC: "BaeDCarry Fan Club",
+  TI: "Third Impact",
+  IGN: "Ignition",
+  OTS: "On The Spot",
+  HOT: "Hot Take",
+  "La Espada": "La Espada",
+  "Royal Vagabonds": "Royal Vagabonds",
+  "Im Not Trying": "Im Not Trying",
+  "United Parcel Service": "United Parcel Service",
+  "DaBabieZ": "DaBabieZ",
+  "BaeDcarry Fan Club": "BaeDCarry Fan Club",
+  "Third Impact": "Third Impact",
+  "Ignition": "Ignition",
+  "On The Spot": "On The Spot",
+  "Hot Take": "Hot Take",
+};
+
+const TEAM_MAP_10 = {
+  LE: "La Espada",
+  RV: "Royal Vagabonds",
+  INT: "Im Not Trying",
+  UPS: "United Parcel Service",
+  DBZ: "DaBabieZ",
+  BFC: "BaeDCarry Fan Club",
+  TI: "Third Impact",
+  IGN: "Ignition",
+  OTS: "On The Spot",
+  HOT: "Hot Take",
 };
 
 const ROLE_MAP = {
@@ -87,6 +100,8 @@ const QUOTE_LIST = [
 const HELP_MSG =
   "The following commands are available: \n \n" +
   "*!autoassign*: Not implemented yet. \n" +
+  "*!avg-invite*: Displays our publicly available discord invite link. \n" +
+  "*!dl [team1 team2] [ban1 ban2]: Returns draftlol link for specified teams/bans. \n" +
   "*!fa [leave, join]*: Controls admission to Free Agent group. \n" +
   "*!ff*: Displays this help message. \n" +
   "*!mh*: Displays a team's match history. \n" +
@@ -117,6 +132,7 @@ module.exports = Object.freeze({
   PREFIX: PREFIX,
   HELP_MSG: HELP_MSG,
   TEAM_MAP: TEAM_MAP,
+  TEAM_MAP_10: TEAM_MAP_10,
   TW_IMG1: TW_IMG1,
   TW_IMG2: TW_IMG2,
   TW_URL: TW_URL,
