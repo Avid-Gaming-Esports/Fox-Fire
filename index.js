@@ -37,21 +37,6 @@ client.on("message", async function(message) {
     case "avg-invite":
       message.channel.send("https://discord.gg/q33MTAVdke");
       break;
-    // case "fa":
-    //   if (args[0] === undefined) {
-    //     return;
-    //   }
-    //   let faverb = args[0].toLowerCase();
-    //   if (["join", "leave"].includes(faverb)) {
-    //     let role = message.guild.roles.cache.find(r => r.name === "Free Agent");
-    //     let member = message.member;
-    //     if (faverb === "join") {
-    //       member.roles.add(role);
-    //     } else {
-    //       member.roles.remove(role);
-    //     }
-    //   }
-    //   break;
     case "ff":
       message.channel.send(constants.HELP_MSG);
       break;
@@ -115,14 +100,13 @@ client.on("message", async function(message) {
       if (constants.VALID_ROLES.includes(selector)) {
         const res = await accessPlayerSpreadSheet();
         selector = constants.ROLE_MAP[args[0].toUpperCase()];
-        // console.log(selector)
         switch (selector) {
           case "ALL":
             resp +=
-              "Pulling top 10 power rankings: " +
+              "Pulling top 25 power rankings: " +
               "\n" +
               "#####################################";
-            for (let i = 1; i < 11; i++) {
+            for (let i = 1; i < 26; i++) {
               let idx = i.toString();
               let role =
                 res[idx][2].charAt(0).toUpperCase() +
@@ -291,7 +275,7 @@ client.login(config.BOT_TOKEN);
 
 async function accessPlayerSpreadSheet() {
   const doc = new GoogleSpreadsheet(
-    "1oiKPuIbBt1_4U8IC0jIKz9_IMl4V5_PAqA_jrhdAsuo"
+    "1OEj_sjInYb1q_Ap2_k6LFvAw6NKglDgWewFE_lDgYpU"
   );
   await doc.useServiceAccountAuth({
     client_email: creds.client_email,
@@ -299,9 +283,9 @@ async function accessPlayerSpreadSheet() {
   });
   await doc.loadInfo();
 
-  const sheet = doc.sheetsById[1076286390];
+  const sheet = doc.sheetsById[793113677];
   const rows = await sheet.getRows({
-    offset: 4,
+    offset: 3,
     limit: 100
   });
 
@@ -316,7 +300,7 @@ async function accessPlayerSpreadSheet() {
 
 async function accessTeamSpreadSheet(type) {
   const doc = new GoogleSpreadsheet(
-    "1oiKPuIbBt1_4U8IC0jIKz9_IMl4V5_PAqA_jrhdAsuo"
+    "1OEj_sjInYb1q_Ap2_k6LFvAw6NKglDgWewFE_lDgYpU"
   );
   await doc.useServiceAccountAuth({
     client_email: creds.client_email,
@@ -391,7 +375,7 @@ async function getTournamentStageMatches(stage) {
     // "Big Shmeat Gang": [[], []]
   };
   Object.values(constants.TEAM_MAP_10).forEach(key => {
-    teams[key] = [[], []]
+    teams[key.toString()] = [[], []]
   })
   for (match in response.data) {
     var winner;
